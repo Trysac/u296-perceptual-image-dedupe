@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added perceptual image deduplication library with bounded PNM/PNG decoding, ahash/dhash/phash, Hamming distance, deterministic grouping, and CLI.
 - Initial project structure from the factory utility template.

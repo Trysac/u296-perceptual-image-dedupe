@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+perceptual-image-dedupe = "perceptual_image_dedupe.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u296-perceptual-image-dedupe"
 Source = "https://github.com/Trysac/u296-perceptual-image-dedupe"

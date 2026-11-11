@@ -1,16 +1,15 @@
 # perceptual-image-dedupe
 
-> Find duplicate and near-duplicate images with average, difference and DCT perceptual hashes, bounded PNM and PNG decoding, Hamming distance and deterministic groups Python package `trysac-perceptual-image-dedupe`, import name `perceptual_image_dedupe`, MIT licensed,
-> Python >= 3.10, no runtime dependencies.
+> Find duplicate and near-duplicate images with average, difference and DCT perceptual hashes, bounded PNM and PNG decoding, Hamming distance and deterministic groups. Python package `trysac-perceptual-image-dedupe`, import name `perceptual_image_dedupe`, Python >= 3.10, no runtime dependencies.
 
 ## Docs
 
-- [README](README.md): problem, install, usage example
-- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
-- [Architecture](docs/ARCHITECTURE.md): shape of the package and its public API
-- [Testing](docs/TESTING.md): how to run and extend the tests
+- [README](README.md): problem, installation, usage example, public API, limits and errors
+- [Architecture](docs/ARCHITECTURE.md): package modules and design decisions
+- [Testing](docs/TESTING.md): the test files present in the supplied snapshot
+- [Security](docs/SECURITY.md): defended and undefended threats with decoding limits
+- [Project](docs/PROJECT.md): objective, scope, out-of-scope and effort table
 
 ## Optional
 
-- [Stack](docs/STACK.md): tools used and discarded
-- [Changelog](CHANGELOG.md): release history
+- [Stack](docs/STACK.md): standard-library use, absent dependencies and discarded options

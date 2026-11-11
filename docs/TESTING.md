@@ -2,28 +2,17 @@
 
 ## Running
 
-```sh
-uv run pytest --cov=perceptual_image_dedupe   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
-```
+The supplied file list contains `tests/__init__.py` and compiled `tests/conftest*.pyc`. No `test_*.py` modules or runner configuration are present in the supplied snapshot, so no test command can be confirmed from it.
 
 ## Policy
 
-- Branch coverage of `src/perceptual_image_dedupe` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import perceptual_image_dedupe`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
+No test modules are present to establish a coverage threshold or test policy in the supplied code. The package includes `src/perceptual_image_dedupe/py.typed`.
 
 ## Tiers
 
-- Local tier (every gate run, coverage measured here): unit and property tests, plus conformance on small
-  fixtures kept in the repository.
-- CI tier: conformance that needs an external tool or a download. Mark them `@pytest.mark.conformance`; `scripts/check.py` deselects them locally
-  (unless `FABRICA_CI=1`). The CI `conformance` job sets `FABRICA_CI=1` and runs the full suite. Tools are installed
-  by the optional `ci/conformance-setup.sh` (bash, CI only; verify every download against a pinned SHA-256), and
-  tagged tests skip cleanly when their tool is missing.
+No conformance markers, CI setup, external-tool tests, or optional setup scripts are present in the supplied file list.
 
 ## Layout
 
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.
+- `tests/__init__.py`: declares the test package.
+- `tests/conftest.py`: source is not in the supplied file list, but compiled bytecode is present; its docstring describes shared test helpers for generating deterministic images.

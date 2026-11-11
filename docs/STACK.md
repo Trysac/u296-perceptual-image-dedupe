@@ -4,20 +4,16 @@
 
 | Tool | Why |
 |---|---|
-| Python >= 3.10 | Widest supported range that still allows modern typing syntax. |
-| uv | Fast, reproducible environments and builds on Windows and Linux. |
-| hatchling | Simple, standards-based build backend; no setup.py. |
-| ruff | Lint and format in one fast tool. |
-| mypy (strict) | Catches type errors before release; the package ships `py.typed`. |
-| pytest + pytest-cov | De facto standard test runner with branch coverage. |
-| gitleaks | Secret scanning locally and in CI. |
-| GitHub Actions + Dependabot | Thin CI wrapper over the local gates; weekly dependency updates. |
+| Python >= 3.10 | The specification target; the code uses modern typing such as `list[str] | None` and `from __future__ import annotations`. |
+| Python standard library | Runtime imports include `argparse`, `os`, `sys`, `logging`, `dataclasses`, `math`, `struct`, `zlib`, `typing`, and `collections.abc`; `allowed_dependencies` is empty. |
+| No third-party runtime dependencies | PNG/PNM decoding, resizing, hash methods, Hamming distance, and grouping are implemented in `perceptual_image_dedupe`. |
 
 ## Discarded
 
 | Tool | Why not |
 |---|---|
-| Poetry | Slower, and uv covers the same needs with standard dependency groups. |
-| black + isort + flake8 | Replaced by ruff: one tool instead of three. |
-| tox / nox | The OS matrix lives in CI; locally a single `scripts/check.py` is enough. |
-| Shell scripts for gates | Not portable to Windows; the gates are a stdlib Python script. |
+| Pillow | Not used; the package implements bounded PNM and PNG decoding itself. |
+| NumPy | Not used; hashing and grouping are pure Python. |
+| JPEG, WebP, GIF decoders | Out of scope; the README requires converting these formats first. |
+| GPU execution and rotation/crop invariance | Out of scope per the specification. |
+| File deletion | Out of scope; the CLI only reads files and reports groups. |

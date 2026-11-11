@@ -1,48 +1,63 @@
-# perceptual-image-dedupe
+# trysac-perceptual-image-dedupe
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-perceptual-image-dedupe)](https://pypi.org/project/trysac-perceptual-image-dedupe/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-perceptual-image-dedupe)](LICENSE)
-[![CI](https://github.com/Trysac/u296-perceptual-image-dedupe/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u296-perceptual-image-dedupe/actions/workflows/ci.yml)
+Find duplicate and near-duplicate images with deterministic perceptual hashes, bounded PNM/PNG decoding, and stable grouping. The package uses only the Python standard library; it does not depend on Pillow or NumPy.
 
-Find duplicate and near-duplicate images with average, difference and DCT perceptual hashes, bounded PNM and PNG decoding, Hamming distance and deterministic groups
+## Installation
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-```sh
+```bash
 pip install trysac-perceptual-image-dedupe
-# or
-uv add trysac-perceptual-image-dedupe
 ```
-
-Requires Python 3.10 or newer. No runtime dependencies.
 
 ## Usage
 
 ```python
-import perceptual_image_dedupe
+from perceptual_image_dedupe import load_image, image_hash, find_duplicates
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(perceptual_image_dedupe.normalize("  Hello World "))  # -> "hello world"
-
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    perceptual_image_dedupe.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+with open("photo.png", "rb") as f:
+    img = load_image(f.read())
+h = image_hash(img, "dhash")
+groups = find_duplicates({"photo.png": h, "other.png": h}, max_distance=10)
+print(groups)
 ```
+
+Command line:
+
+```bash
+perceptual-image-dedupe ./photos --method dhash --recursive
+```
+
+## Supported formats
+
+- PNM: P2, P3, P5, P6 (maxval 1-255, comments allowed in the header)
+- PNG: 8-bit non-interlaced, color types 0 (gray), 2 (RGB), 4 (gray+alpha), 6 (RGBA), all five filter types, chunk CRC checked, and IHDR dimensions checked against `max_pixels` before inflating.
+
+JPEG, WebP and GIF are out of scope: convert them first.
+
+## Hash methods
+
+- `ahash`: resize to 8x8, bit = 1 if the pixel is greater than the mean of the 64 values.
+- `dhash`: resize to 9x8, bit = 1 if the right neighbour is greater than the left pixel.
+- `phash`: resize to 32x32, apply a 2-D DCT-II, take the top-left 8x8 block, bit = 1 if a coefficient is greater than the median of those 64 values excluding the DC term; the DC term still contributes its own bit.
+
+## Public API
+
+- `GrayImage(width: int, height: int, pixels: bytes)` is a frozen dataclass; `pixels` is row-major with one byte per pixel and length `width * height`. It raises `ValueError` for non-positive dimensions or a wrong pixel length.
+- `load_image(data: bytes, *, max_bytes: int = 104_857_600, max_pixels: int = 50_000_000) -> GrayImage` decodes PNM or PNG. It raises `DedupeError` with `input_too_large`, `image_too_large`, `invalid_image`, or `unsupported_image`.
+- `image_hash(img: GrayImage, method: Literal["ahash", "dhash", "phash"] = "dhash") -> int` returns a 64-bit hash; an unknown method raises `DedupeError` with `invalid_argument`.
+- `hamming(a: int, b: int) -> int` returns the number of differing bits.
+- `find_duplicates(hashes: Mapping[str, int], *, max_distance: int = 10, max_items: int = 100_000) -> list[list[str]]` returns single-link groups of size at least two, sorted inside each group, with groups sorted by their first key. A negative `max_distance` raises `invalid_argument`; more than `max_items` hashes raises `too_many_images`.
+- `DedupeError(Exception)` exposes `code` and `message`; `message` is truncated to 200 characters. Codes are `input_too_large`, `image_too_large`, `invalid_image`, `unsupported_image`, `too_many_images`, and `invalid_argument`.
+
+The package logger is `perceptual_image_dedupe` and has a `NullHandler` by default. The CLI reads `.png`, `.pgm`, `.ppm`, and `.pnm` files, reports other files as skipped, prints one group per line with paths relative to the folder, exits 0 when no duplicates are found, 1 when duplicates are found, and 2 for usage or a missing folder.
+
+## Why not imagehash
+
+The specification names `imagehash` as the best-known alternative. This package avoids Pillow and NumPy and specifies resizing, grayscale/alpha conversion, hash bit order and grouping so the pipeline is stable across versions.
+
+## Security
+
+The decoding limits and threat model are documented in [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
-
-## License
-
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+See `docs/` for architecture, security, testing and project scope.
